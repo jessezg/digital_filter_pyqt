@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QLabel, QComboBox, QHBoxLayout, QScrollArea, QWidget, QSpinBox, QDoubleSpinBox, QMessageBox
-from base_window import BaseWindow
-from filter_selection_window import FilterSelectionWindow
+from gui_base import BaseWindow
+from gui_filter_selection import FilterSelectionWindow
 import numpy as np
 
 class SignalSelectionWindow(BaseWindow):
@@ -59,7 +59,7 @@ class SignalSelectionWindow(BaseWindow):
 
         # 幅值输入框
         amplitude_input = QDoubleSpinBox()
-        amplitude_input.setRange(0, 10)
+        amplitude_input.setRange(0, 1000)
         amplitude_input.setValue(params.get('amplitude', 1) if params else 1)
         row_layout.addWidget(QLabel("幅值:"))
         row_layout.addWidget(amplitude_input)
@@ -128,6 +128,11 @@ class SignalSelectionWindow(BaseWindow):
             row_layout.addWidget(QLabel("直流量:"))
             row_layout.addWidget(dc_value_input)
 
+        # 创建删除按钮
+        delete_button = QPushButton("删除")
+        delete_button.clicked.connect(lambda: self.remove_signal_row(row_layout))
+        row_layout.addWidget(delete_button)
+
         # 将新创建的输入行添加到 form_layout
         self.form_layout.addLayout(row_layout)
         
@@ -142,7 +147,7 @@ class SignalSelectionWindow(BaseWindow):
             'rate': rate_input if signal_type == '脉冲噪声' else None,
             'dc_value': dc_value_input if signal_type == '直流' else None,
         }
-        self.signal_entries.append((signal_type, signal_params))
+        self.signal_entries.append({'type': signal_type, 'params': signal_params, 'layout': row_layout})
 
 
 
@@ -152,16 +157,16 @@ class SignalSelectionWindow(BaseWindow):
     def save_and_next(self):
         saved_signals = []
         for entry in self.signal_entries:
-            signal_type = entry[0]
+            signal_type = entry['type']
             params = {
-                'amplitude': entry[1]['amplitude'].value(),
-                'period': entry[1]['period'].value() if entry[1]['period'] else None,
-                'phase': entry[1]['phase'].value() if entry[1]['phase'] else None,
-                'duty': entry[1]['duty'].value() if entry[1]['duty'] else None,
-                'mean': entry[1]['mean'].value() if entry[1]['mean'] else None,
-                'stddev': entry[1]['stddev'].value() if entry[1]['stddev'] else None,
-                'rate': entry[1]['rate'].value() if entry[1]['rate'] else None,
-                'dc_value': entry[1]['dc_value'].value() if entry[1]['dc_value'] else None,
+                'amplitude': entry['params']['amplitude'].value(),
+                'period': entry['params']['period'].value() if entry['params']['period'] else None,
+                'phase': entry['params']['phase'].value() if entry['params']['phase'] else None,
+                'duty': entry['params']['duty'].value() if entry['params']['duty'] else None,
+                'mean': entry['params']['mean'].value() if entry['params']['mean'] else None,
+                'stddev': entry['params']['stddev'].value() if entry['params']['stddev'] else None,
+                'rate': entry['params']['rate'].value() if entry['params']['rate'] else None,
+                'dc_value': entry['params']['dc_value'].value() if entry['params']['dc_value'] else None,
             }
             saved_signals.append({'type': signal_type, 'params': params})
 
@@ -194,3 +199,20 @@ class SignalSelectionWindow(BaseWindow):
     #     self.close()
     #     self.welcome_window = WelcomeWindow()
     #     self.welcome_window.show()
+
+    # 移除指定行的信号条目
+    def remove_signal_row(self, row_layout):
+        for i, entry in enumerate(self.signal_entries):
+            if entry['layout'] == row_layout:
+                # 从signal_entries中删除该信号
+                self.signal_entries.pop(i)
+                break
+
+        # 删除布局中的控件
+        while row_layout.count():
+            widget = row_layout.takeAt(0).widget()
+            if widget is not None:
+                widget.deleteLater()
+        
+        # 删除该行布局
+        row_layout.deleteLater()

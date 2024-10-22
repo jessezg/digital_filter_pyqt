@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QLabel, QHBoxLayout, QGroupBox, QRadioButton, QSpinBox, QDoubleSpinBox, QMessageBox
-from base_window import BaseWindow
-from result_window import ResultWindow
+from gui_base import BaseWindow
+from gui_result import ResultWindow
 
 class FilterSelectionWindow(BaseWindow):
     def __init__(self, saved_signals):

@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QLabel, QHBoxLayout
-from base_window import BaseWindow
-from signal_selection_window import SignalSelectionWindow
+from gui_base import BaseWindow
+from gui_signal_selection import SignalSelectionWindow
 
 class WelcomeWindow(BaseWindow):
     def __init__(self):
