@@ -9,7 +9,7 @@ def plot_signals(input_signal, filter_response, output_signal, sample_rate):
     font_prop = font_manager.FontProperties(fname=font_path)
     plt.rcParams['font.family'] = font_prop.get_name()
 
-    fig, axs = plt.subplots(3, 3, figsize=(15, 10))
+    fig, axs = plt.subplots(3, 2, figsize=(15, 10))
     t = np.arange(len(input_signal)) / sample_rate
     max_time = t[-1]
 
@@ -38,14 +38,6 @@ def plot_signals(input_signal, filter_response, output_signal, sample_rate):
     axs[1, 1].set_title('滤波器幅频响应')
     axs[2, 1].plot(freqs[:len(freqs)//2], np.abs(output_fft)[:len(freqs)//2])
     axs[2, 1].set_title('输出信号幅频响应')
-
-    # 相频响应
-    axs[0, 2].plot(freqs[:len(freqs)//2], np.angle(input_fft)[:len(freqs)//2])
-    axs[0, 2].set_title('输入信号相频响应')
-    axs[1, 2].plot(freqs[:len(freqs)//2], np.angle(filter_fft)[:len(freqs)//2])
-    axs[1, 2].set_title('滤波器相频响应')
-    axs[2, 2].plot(freqs[:len(freqs)//2], np.angle(output_fft)[:len(freqs)//2])
-    axs[2, 2].set_title('输出信号相频响应')
 
     plt.tight_layout()
     return fig, axs

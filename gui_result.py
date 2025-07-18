@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QLabel, QHBoxLayout, QMessageBox
 from gui_base import BaseWindow
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -28,7 +28,7 @@ class ResultWindow(BaseWindow):
 
         # 应用滤波器
         filter_response = filter_func(self.saved_filter, self.sample_rate)
-        
+
         # 生成输出
         output_signal = apply_filter(input_signal, self.saved_filter, self.sample_rate)
 
@@ -46,6 +46,11 @@ class ResultWindow(BaseWindow):
         layout.addLayout(button_layout)
 
         self.setLayout(layout)
+        
+        filter_fft = np.fft.fft(filter_response)
+        if max(filter_fft) > 3:
+            QMessageBox.warning(self, "图形错误",\
+            "阶数过高、下上截止频率过小过大或过于接近，导致 Python 计算精度不足，滤波器频率响应无法实现归一化")
 
     def finish(self):
         self.close()

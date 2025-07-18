@@ -8,7 +8,13 @@ class WelcomeWindow(BaseWindow):
         layout = QVBoxLayout()
 
         # 增加介绍信息
-        label = QLabel("欢迎使用滤波器展示程序！\n在这里，你可以创建不同类型的信号，选择滤波器，并观察滤波效果。")
+        label = QLabel(
+        """
+    欢迎使用滤波器展示程序!
+    在这里，你可以创建不同类型的信号，选择滤波器，并观察滤波效果。
+    请点击“下一步”开始。
+        """
+        )
         layout.addWidget(label)
 
         next_button = QPushButton('下一步')

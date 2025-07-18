@@ -20,9 +20,9 @@ class FilterSelectionWindow(BaseWindow):
         # 初始化一个字典 filter_buttons 存储各个滤波器按钮
         self.filter_buttons = {}
         filter_types = [
-            '巴特沃兹低通', '巴特沃兹高通', '巴特沃兹带通', '巴特沃兹带阻',
-            '切比雪夫1型低通', '切比雪夫1型高通', '切比雪夫1型带通', '切比雪夫1型带阻',
-            '切比雪夫2型低通', '切比雪夫2型高通', '切比雪夫2型带通', '切比雪夫2型带阻'
+            '巴特沃兹低通滤波器', '巴特沃兹高通滤波器', '巴特沃兹带通滤波器', '巴特沃兹带阻滤波器',
+            '切比雪夫1型低通滤波器', '切比雪夫1型高通滤波器', '切比雪夫1型带通滤波器', '切比雪夫1型带阻滤波器',
+            '切比雪夫2型低通滤波器', '切比雪夫2型高通滤波器', '切比雪夫2型带通滤波器', '切比雪夫2型带阻滤波器'
         ]
         self.selected_filter = None
 
@@ -46,25 +46,25 @@ class FilterSelectionWindow(BaseWindow):
         param_layout.addWidget(self.order_label)
         param_layout.addWidget(self.order_input)
 
-        self.cutoff_label = QLabel("截止频率：")
+        self.cutoff_label = QLabel("截止频率(Hz)：")
         self.cutoff_input = QDoubleSpinBox()
-        self.cutoff_input.setRange(0.01, 1000.0)
+        self.cutoff_input.setRange(0.01, 499.99)
         self.cutoff_input.setSingleStep(0.1)
         param_layout.addWidget(self.cutoff_label)
         param_layout.addWidget(self.cutoff_input)
 
-        self.low_cutoff_label = QLabel("下截止频率：")
+        self.low_cutoff_label = QLabel("下截止频率(Hz)：")
         self.low_cutoff_input = QDoubleSpinBox()
-        self.low_cutoff_input.setRange(0.01, 1000.0)
+        self.low_cutoff_input.setRange(0.01, 499.99)
         self.low_cutoff_input.setSingleStep(0.1)
         self.low_cutoff_label.hide()
         self.low_cutoff_input.hide()
         param_layout.addWidget(self.low_cutoff_label)
         param_layout.addWidget(self.low_cutoff_input)
 
-        self.high_cutoff_label = QLabel("上截止频率：")
+        self.high_cutoff_label = QLabel("上截止频率(Hz)：")
         self.high_cutoff_input = QDoubleSpinBox()
-        self.high_cutoff_input.setRange(0.01, 1000.0)
+        self.high_cutoff_input.setRange(0.01, 499.99)
         self.high_cutoff_input.setSingleStep(0.1)
         self.high_cutoff_label.hide()
         self.high_cutoff_input.hide()
@@ -85,7 +85,6 @@ class FilterSelectionWindow(BaseWindow):
 
         # 添加“上一步”和“下一步”按钮
         button_layout = QHBoxLayout()
-        # 因为分了文件后会出 bug 所以先去掉
         # back_button = QPushButton('上一步')
         # back_button.clicked.connect(self.back_window)
         next_button = QPushButton('下一步')
@@ -138,11 +137,18 @@ class FilterSelectionWindow(BaseWindow):
             'ripple': self.ripple_input.value() if '切比雪夫' in self.selected_filter else None,
             'type': self.selected_filter.lower()
         }
+        
 
         # 对于带通或带阻滤波器，使用上、下截止频率
         if '带通' in self.selected_filter or '带阻' in self.selected_filter:
             filter_params['low_cut'] = self.low_cutoff_input.value()
             filter_params['high_cut'] = self.high_cutoff_input.value()
+            
+            # 令上限截止频率不能大于下线截止频率
+            if filter_params['low_cut'] >= filter_params['high_cut']:
+                QMessageBox.warning(self, "无效输入", "下截止频率必须小于上截止频率")
+                return
+            
         else:
             filter_params['cutoff'] = self.cutoff_input.value()
 

@@ -9,7 +9,19 @@ class SignalSelectionWindow(BaseWindow):
         self.saved_signals = saved_signals if saved_signals else []
         self.signal_entries = [] # 存储用户输入的信号信息
         layout = QVBoxLayout() # 用于组织界面布局
-
+        # 增加介绍信息
+        label = QLabel(
+"""
+选择信号类型并设置参数，各个信号之间是相互独立的，累加的关系：
+"""
+# """
+#  测试用例：信号1：正弦信号      幅值：5    频率：200Hz  相位：0；
+#           信号2：正弦信号      幅值：5    频率：300Hz  相位：0；
+#           信号3：正弦信号      幅值：5    频率：400Hz  相位：0；
+#           信号4：白噪声信号    幅值：0.1  均值：0      标准差：0；
+# """
+        )
+        layout.addWidget(label)
         self.form_layout = QVBoxLayout()
 
         # 创建信号类型的下拉选择框
@@ -36,7 +48,7 @@ class SignalSelectionWindow(BaseWindow):
 
         # 创建“上一步”，“下一步”方法
         button_layout = QHBoxLayout()
-        # 有 bug 先去掉
+
         # back_button = QPushButton('上一步')
         # back_button.clicked.connect(self.back_window)
         next_button = QPushButton('下一步')
@@ -66,13 +78,13 @@ class SignalSelectionWindow(BaseWindow):
 
         # 根据信号类型设置额外的参数输入
         if signal_type in ['正弦波', '方波', '三角波', '锯齿波']:
-            # 周期输入
-            period_input = QDoubleSpinBox()
-            period_input.setRange(0.01, 1000)
-            period_input.setValue(params.get('period', 1) if params else 1)
-            row_layout.addWidget(QLabel("周期:"))
-            row_layout.addWidget(period_input)
-            
+            # 频率输入
+            frequency_input = QDoubleSpinBox()
+            frequency_input.setRange(0.01, 499.99)
+            frequency_input.setValue(params.get('frequency', 1) if params else 1)
+            row_layout.addWidget(QLabel("频率 (Hz):"))
+            row_layout.addWidget(frequency_input)
+
             if signal_type == '正弦波':
                 # 相位输入
                 phase_input = QDoubleSpinBox()
@@ -139,7 +151,7 @@ class SignalSelectionWindow(BaseWindow):
         # 将输入控件的引用保存到 signal_entries 列表中，以便后续读取数据
         signal_params = {
             'amplitude': amplitude_input,
-            'period': period_input if signal_type in ['正弦波', '方波', '三角波', '锯齿波'] else None,
+            'frequency': frequency_input if signal_type in ['正弦波', '方波', '三角波', '锯齿波'] else None,
             'phase': phase_input if signal_type == '正弦波' else None,
             'duty': duty_cycle_input if signal_type == '方波' else None,
             'mean': mean_input if signal_type in ['白噪声', '高斯噪声'] else None,
@@ -160,7 +172,7 @@ class SignalSelectionWindow(BaseWindow):
             signal_type = entry['type']
             params = {
                 'amplitude': entry['params']['amplitude'].value(),
-                'period': entry['params']['period'].value() if entry['params']['period'] else None,
+                'frequency': entry['params']['frequency'].value() if entry['params']['frequency'] else None,
                 'phase': entry['params']['phase'].value() if entry['params']['phase'] else None,
                 'duty': entry['params']['duty'].value() if entry['params']['duty'] else None,
                 'mean': entry['params']['mean'].value() if entry['params']['mean'] else None,
@@ -171,7 +183,7 @@ class SignalSelectionWindow(BaseWindow):
             saved_signals.append({'type': signal_type, 'params': params})
 
         if not saved_signals:
-            QMessageBox.warning(self, "警告", "请选择一个信号")
+            QMessageBox.warning(self, "警告", "请至少选择一个信号")
             return
 
         self.close()

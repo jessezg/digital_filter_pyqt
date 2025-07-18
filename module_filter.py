@@ -52,6 +52,19 @@ def filter_func(filter_info, sample_rate):
     impulse = np.zeros(1000)
     impulse[0] = 1
 
+    # 对滤波器进行归一化
+    if '带通' in filter_type or '带阻' in filter_type:
+        # 设置 freqz 的计算范围为低截止和高截止频率之间
+        w, h = signal.freqz(b, a, worN=np.linspace(params['low_cut'], params['high_cut'], 1000), fs=sample_rate)
+    else:
+        # 对于非带通/带阻滤波器，按原始方式计算
+        w, h = signal.freqz(b, a, worN=8000, fs=sample_rate)
+
+    max_h = np.abs(h).max()
+    b /= max_h
+    a /= max_h
+    
+
     # 使用 lfilter 函数计算滤波器的时域响应
     response = signal.lfilter(b, a, impulse)
     return response

@@ -9,20 +9,18 @@ def generate_signals(entries, sample_rate=1000):
         signal_type = entry['type']
         params = entry['params']
         amplitude = params['amplitude']
+        frequency = params['frequency']
+
         if signal_type == '正弦波':
-            period = params['period']
             phase = params['phase']
-            combined_signal += amplitude * np.sin(2 * np.pi / period * t + phase)
+            combined_signal += amplitude * np.sin(2 * np.pi * frequency * t + phase)
         elif signal_type == '方波':
-            period = params['period']
             duty = params['duty']
-            combined_signal += amplitude * signal.square(2 * np.pi / period * t, duty)
+            combined_signal += amplitude * signal.square(2 * np.pi * frequency * t, duty)
         elif signal_type == '三角波':
-            period = params['period']
-            combined_signal += amplitude * signal.sawtooth(2 * np.pi / period * t, 0.5)
+            combined_signal += amplitude * signal.sawtooth(2 * np.pi * frequency * t, 0.5)
         elif signal_type == '锯齿波':
-            period = params['period']
-            combined_signal += amplitude * signal.sawtooth(2 * np.pi / period * t)
+            combined_signal += amplitude * signal.sawtooth(2 * np.pi * frequency * t)
         elif signal_type == '白噪声':
             mean = params['mean']
             stddev = params['stddev']
